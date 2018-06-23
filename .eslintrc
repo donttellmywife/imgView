@@ -1,0 +1,19 @@
+{
+  "extends": [
+    "airbnb"
+  ],
+
+  "rules": {
+    "no-console": "off",
+    "import/extensions": "always",
+    "curly": ["error", "all"],
+    "no-plusplus": "off",
+    "arrow-parens": ["warn", "always"],
+    "func-names": "off",
+    "func-style": "off"
+  },
+
+  "globals": {
+    "document": false
+  },
+}
