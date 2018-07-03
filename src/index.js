@@ -6,6 +6,7 @@ require('./index.sass');
 const settings = {
   maxItems: 5, // items in row
   maxRows: 3, // render rows
+  rowsTillEndToLoad: 1, // on what row before last we need to prefetch items
 };
 
 const bus = EE();
@@ -24,19 +25,21 @@ bus.on('update', (newState) => {
 
 bus.on('keyup', (keyCode) => {
   switch (keyCode) {
-    // horizontal move (on columns)
+    // left
     case 37:
       if (state.x === 0) { return state; }
       return bus.emit('update', { ...state, x: state.x - 1 });
+    // right
     case 39:
       // items in row - 1
       if (state.x === settings.maxItems - 1) { return state; }
       return bus.emit('update', { ...state, x: state.x + 1 });
 
-    // vertical move (on rows)
+    // up
     case 38:
       if (state.y === 0) { return state; }
       return bus.emit('update', { ...state, y: state.y - 1 });
+    // down
     case 40:
       // load items on prelast row
       if (state.y === ((state.items.length / settings.maxItems) - 3)) {
@@ -77,7 +80,7 @@ window.addEventListener('scroll', (event) => {
   event.stopPropagation();
   event.stopImmediatePropagation();
 
-  // detect direction of scroll
+  // detect scroll direction
   const keyCode = state.scroll < window.pageYOffset ? 38 : 40;
   bus.emit('keyup', keyCode);
   state.scroll = window.pageYOffset;
@@ -107,25 +110,28 @@ function makeEl(data) {
 function render({ x, y, items }) {
   rootEl.innerHTML = '';
   const { maxItems, maxRows } = settings;
-  const elements = items.map(makeEl);
 
   // item height * row
   // rootEl.setAttribute('style', `transform: translateY(${-100 * y}px)`);
 
-  elements
-    .map((el, index) => {
-      // 0 -> 0, 0
-      // 1 -> 1, 0
-      // 2 -> 2, 0
-      // 5 -> 0, 1
-      if (x + (y * maxItems) === index) {
-        el.classList.add('active');
-      }
-      return el;
-    })
+  items
+    .map(makeEl)
+    .map(setActive)
     // render only needed rows (3 from settings)
     .slice(y * maxItems, (y * maxItems) + (maxRows * maxItems))
     .forEach((el) => rootEl.append(el));
+
+
+  function setActive(element, index) {
+    // 0 -> 0, 0
+    // 1 -> 1, 0
+    // 2 -> 2, 0
+    // 5 -> 0, 1
+    if (x + (y * maxItems) === index) {
+      element.classList.add('active');
+    }
+    return element;
+  }
 }
 
 
