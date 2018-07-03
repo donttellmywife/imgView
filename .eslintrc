@@ -10,7 +10,9 @@
     "no-plusplus": "off",
     "arrow-parens": ["warn", "always"],
     "func-names": "off",
-    "func-style": "off"
+    "func-style": "off",
+    "no-use-before-define": "off",
+    "no-unused-expressions": "off"
   },
 
   "globals": {
